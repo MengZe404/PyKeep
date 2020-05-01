@@ -3,6 +3,7 @@ import json
 import os
 import PySimpleGUI as sg
 
+# Create data.json
 format = {
     "video":[]
 }
@@ -54,11 +55,14 @@ with open('data.json') as json_file:
 info = data['video']
 
 
+# The actual app, designed with PySimpleGUI
 class app:
     def __init__(self):
         self.info = info
         self.layout()
         global title
+
+        # Display all exsiting data
         title = []
         for i in range(0, len(info)):
             title.append(info[i]['title'])
@@ -124,13 +128,14 @@ class app:
         with open('data.json', 'w') as f:
             json.dump(data, f, indent=4)
 
-
+    # When the user click 'Keep', write the data to json and update the app with new data
     def recordInfo(self):
         self.userInput = values['-URL-']
         self.note = values['-Note-']
         self.addInformation()
         self.window.FindElement('-Title-').Update(values=title)
 
+    # Run the window 
     def readWindow(self):
         self.window = sg.Window("PyKeep", self.windowLayout, size=(700, 480), finalize=True)
         self.window.FindElement('-Title-').Update(values=title)
