@@ -1,5 +1,5 @@
 # PyKeep
-**An open source Python app that keep all your favorite Youtube videos in one place!****
+**An open source Python app that keep all your favorite Youtube videos in one place!**
 
 ## Features
 
