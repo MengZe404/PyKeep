@@ -11,7 +11,7 @@
 >
 >   Add short notes to your favorite videos, such as key points, can be extremely helpful for your memory.
 
-**At this moment, PyKeep only works on Ubuntu 20.04 LTS **
+**At this moment, PyKeep only works on Ubuntu 20.04 LTS**
 
 **Build the app for your own OS can be a fun experience:**
 
