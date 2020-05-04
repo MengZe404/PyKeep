@@ -14,6 +14,7 @@ __version__ = '1.0.0'
 from pytube import YouTube
 import json
 import os
+import webbrowser
 import PySimpleGUI as sg
 
 # Create data.json
@@ -85,7 +86,7 @@ class app:
             i += 1
 
     def layout(self):
-        self.menu = [['File', ['Exit']],
+        self.menu = [['Search', ['YouTube', '---', 'Exit']],
                     ['Theme', ['Light', 'Dark']],
                     ['Help', 'About'],]
 
@@ -95,7 +96,7 @@ class app:
             [sg.Text('URL'), sg.Input(key='-URL-', do_not_clear=False, size=(80, 1))],
             [sg.Text('Note'), sg.Input(key='-Note-', do_not_clear=False, size=(80, 1)), sg.Submit('Keep')],
             [sg.Listbox(values=[], size=(100, 8), enable_events=True, key='-Title-', pad=(5,10))],
-            [sg.Button('Delete')],
+            [sg.Button('Play Video', key='-Browser-'), sg.Button('Delete')],
             [sg.Multiline("URL: ", size=(100, 1), key='Info-1', pad=(5,10), right_click_menu= ['&Right', ['Copy']])],
             [sg.Listbox(values=["Author: ", "View: ", "Rating: ", "Note: "], size=(100, 8), key='Info-2', pad=(5,0))],
             [sg.Button('Download Video', key='-Video-'), sg.Button('Download Audio', key='-Audio-')]]
@@ -165,41 +166,48 @@ class app:
             event, values = self.window.Read()
             if event in (None, 'Exit'):
                 break
+            elif event == 'YouTube':
+                webbrowser.open('https://www.youtube.com/')
             elif event == 'Keep':
                 self.recordInfo()
             elif event == 'Delete':
                 sg.popup_annoying("Delete", "You have successfully deleted this item")
                 self.deleteInformation()
-            elif event == 'Dark':
-                sg.ChangeLookAndFeel('Dark')
+            elif event == '-Browser-':
+                print('Open browser')
+                try:
+                    webbrowser.open(values['Info-1'])
+                except:
+                    sg.popup_annoying('Error', 'No video is selected')
+
             elif event == '-Title-':
                 for x in range(0,len(info)):
                     if str(('["' + info[x]['title'] + '"]')) == str(values['-Title-']) or str(("['" + info[x]['title'] + "']")) == str(values['-Title-']):
                         url = info[x]["url"]
-                        self.window.FindElement('Info-1').Update('URL:     ' + url)
+                        self.window.FindElement('Info-1').Update(url)
                         self.window.FindElement('Info-2').Update(values= [('Author:  ' + info[x]["author"]), ('View:     ' + str(info[x]["view"])), ('Rating:   ' + str(info[x]["rating"])), ('Note:     ' + info[x]["note"])])
 
-            elif event == '-Audio-':
-                for x in range(0,len(info)):
-                    if str(('["' + info[x]['title'] + '"]')) == str(values['-Title-']) or str(("['" + info[x]['title'] + "']")) == str(values['-Title-']):
-                        url = info[x]["url"]
+            elif event == '-Video-':
                 try:
                     sg.popup_scrolled('This feature is not officially done yet','For a better experience, check out: ','https://github.com/jkelol111/tkyoutubedl','Click OK to continue')
+                    url = values['Info-1']
+                    try:
+                        YouTube(url).streams.first().download()
+                        sg.popup_annoying('Download Successed')
+                    except:
+                        sg.popup_annoying('Download Failed')
+                except:
+                    sg.popup_annoying('Error', 'No video is selected')
+
+            elif event == '-Audio-':
+                try:
+                    sg.popup_scrolled('This feature is not officially done yet','For a better experience, check out: ','https://github.com/jkelol111/tkyoutubedl','Click OK to continue')
+                    url = values['Info-1']
                     YouTube(url).streams.filter(only_audio=True).first().download()
                     sg.popup_annoying('Download Successed')
                 except:
                     sg.popup_annoying('Error', 'No video is selected')
                 
-            elif event == '-Video-':
-                for x in range(0,len(info)):
-                    if str(('["' + info[x]['title'] + '"]')) == str(values['-Title-']) or str(("['" + info[x]['title'] + "']")) == str(values['-Title-']):
-                        url = info[x]["url"]
-                try:
-                    sg.popup_scrolled('This feature is not officially done yet','For a better experience, check out: ','https://github.com/jkelol111/tkyoutubedl','Click OK to continue')
-                    YouTube(url).streams.first().download()
-                    sg.popup_annoying('Download Successed')
-                except:
-                    sg.popup_annoying('Error', 'No video is selected')
 
             elif event == 'About':
                 about= """
@@ -208,8 +216,8 @@ Welcome to PyKeep, an open source Python app that organize your Youtube Video Co
 Simply input the video url and wait for a few seconds. The information will automatically be uploaded to data.json database, and you can access your record anytime you want!
 """
                 sg.popup_scrolled(about, title='About')
-            print(event)
-                
+            # print("Event" + event)
+            # print(values)                
 # Excute window
 pykeep = app()
 pykeep.readWindow()
